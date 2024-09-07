@@ -4,6 +4,7 @@
 remove_common_files_and_folders() {
 	local source_dir=$1
 	local target_dir=$2
+	local file_count=0
 
 	# Recursively walk through the target directory
 	find "$target_dir" -type f | while read -r target_file; do
@@ -18,10 +19,11 @@ remove_common_files_and_folders() {
 			echo "Removing file $source_file from source directory because it exists in target directory"
 			rm "$source_file"
 			echo "Removed file $source_file"
+			file_count=$((file_count + 1))
 		fi
 	done
 
-	echo "File removal complete!"
+	echo "Total files removed: $file_count"
 }
 
 # Function to create symlinks from source_dir (original) to target_dir (symlinks)
