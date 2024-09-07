@@ -15,8 +15,9 @@ remove_common_files_and_folders() {
 
 		# Check if the file exists in the source directory
 		if [ -e "$source_file" ]; then
+			echo "Removing file $source_file from source directory because it exists in target directory"
 			rm "$source_file"
-			echo "Removed file $source_file from source directory because it exists in target directory"
+			echo "Removed file $source_file"
 		fi
 	done
 
