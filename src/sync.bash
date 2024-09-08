@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Function to remove files from the source if they exist in the target directory's relative structure
 remove_common_files_and_folders() {
@@ -26,28 +26,35 @@ remove_common_files_and_folders() {
 	echo "Total files removed: $file_count"
 }
 
-# Function to create symlinks from source_dir (original) to target_dir (symlinks)
-create_symlinks() {
+# Function to create symlinks recursively
+create_symlinks_recursively() {
 	local source_dir=$1
 	local target_dir=$2
 
-	# Loop through all files in the source directory
-	for file in "$source_dir"/*; do
-		# Get the base name of the file
-		basefile=$(basename "$file")
+	# Loop through all items in the source directory
+	for item in "$source_dir"/*; do
+		# Get the base name of the item
+		baseitem=$(basename "$item")
 
-		# Create a symbolic link in the target directory
-		ln -s "$file" "$target_dir/$basefile"
-
-		# Output message
-		echo "Created symlink for $basefile in $target_dir"
+		# If item is a directory, apply the same logic recursively
+		if [ -d "$item" ]; then
+			# Create the directory in the target directory if it doesn't exist
+			if [ ! -d "$target_dir/$baseitem" ]; then
+				mkdir -p "$target_dir/$baseitem"
+				echo "Created directory $target_dir/$baseitem"
+			fi
+			# Recursively process the directory
+			create_symlinks_recursively "$item" "$target_dir/$baseitem"
+		# If item is a file, create a symlink in the target directory
+		elif [ -f "$item" ]; then
+			ln -s "$item" "$target_dir/$baseitem"
+			echo "Created symlink for $baseitem in $target_dir"
+		fi
 	done
-
-	echo "Symlinking complete!"
 }
 
 DOTFILES_HOME=$(dirname $(dirname $(realpath $0)))/home
 echo "dotfiles home at $DOTFILES_HOME"
 echo "user home at $HOME"
-remove_common_files_and_folders $HOME $DOTFILES_HOME
-create_symlinks $DOTFILES_HOME $HOME
+# remove_common_files_and_folders $HOME $DOTFILES_HOME
+# create_symlinks $DOTFILES_HOME $HOME
